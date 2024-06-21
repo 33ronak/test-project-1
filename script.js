@@ -1,13 +1,12 @@
-const userName = document.getElementById('name');
-const userRating = document.getElementById('rating');
-
 function onSubmit(event) {
     event.preventDefault();
 
     const displayName = userName.value;
     const displayRating = userRating.value;
 
-    const info = displayName + ' ' + displayRating + '  ';
+    const isUpdate = userName.dataset.isUpdate === 'true';
+
+    const info = displayName + ' ' + displayRating + '';
     const displayInfo = document.createElement('p');
     const textNode = document.createTextNode(info);
 
@@ -33,13 +32,31 @@ function onSubmit(event) {
     const currentValue = parseInt(correspondingSpan.textContent);
     correspondingSpan.textContent = currentValue + 1;
 
+    const ratingData = {
+        username: userName.value,
+        rating: userRating.value
+    };
+
+    let apiUrl = "https://crudcrud.com/api/7f3e47c7a1464983b7f0307ff7cf2acd/rating";
+
+    if (isUpdate) {
+        axios
+       .put(apiUrl, ratingData)
+       .then((res) => console.log(res))
+       .catch((err) => console.log(err));
+    } else {
+        axios
+       .post(apiUrl, ratingData)
+       .then((res) => console.log(res))
+       .catch((err) => console.log(err));
+    }
+
     userName.value = '';
     userRating.value = '1';
+    userName.dataset.isUpdate = 'false';
 }
 
-
 function onEdit(button) {
-    
     const paragraph = button.parentNode;
     const textNode = paragraph.childNodes[0];
   
@@ -48,20 +65,21 @@ function onEdit(button) {
   
     userName.value = name;
     userRating.value = rating;
+    userName.dataset.isUpdate = 'true';
+}
 
-    paragraph.remove();
-  }
-
-  function onDelete(button) {
+function onDelete(button) {
     const paragraph = button.parentNode;
     const textNode = paragraph.childNodes[0];
   
     const text = textNode.textContent;
     const [name, rating] = text.split(' ');
-
-    const correspondingSpan = document.getElementById(`rating${rating}`);
-    const currentValue = parseInt(correspondingSpan.textContent);
-    correspondingSpan.textContent = currentValue - 1;
-
+  
+    const apiUrl = "https://crudcrud.com/api/7f3e47c7a1464983b7f0307ff7cf2acd/rating";
+    axios
+       .delete(`${apiUrl}/${name}`)
+       .then((res) => console.log(res))
+       .catch((err) => console.log(err));
+  
     paragraph.remove();
 }
