@@ -6,9 +6,40 @@
     <title>Feedback</title>
 </head>
 <body>
-    <div>
+    <div style="text-align: center;">
         <h1>Feedback System</h1>     
+    </div>
+
+    <h3>Overall Ratings</h3>
+
+    <div class="ratingView">
+        <span>*</span> <span id="rating1">0</span> <br>
+        <span>**</span> <span id="rating2">0</span> <br>
+        <span>***</span> <span id="rating3">0</span> <br>
+        <span>****</span> <span id="rating4">0</span> <br>
+        <span>*****</span> <span id="rating5">0</span> <br>
+    </div>
+    <br>
+
+    <div id="form">
+        <form id="feedbackForm">
+            Enter your name: <input type="text" id="name">
+            <label>Give a rating</label>
+            <select id="rating">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <button type="submit" onclick="onSubmit(event)">SUBMIT</button>
+        </form>
+        <br><br>
+        <h3 id="feedbackHeader">ALL FEEDBACKS</h3>
+        <div id="displayFeedback"></div>
     </div>
     
 </body>
+
+<script src="script.js"></script> 
 </html>
