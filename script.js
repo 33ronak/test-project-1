@@ -1,4 +1,3 @@
-
 const submitBtn = document.getElementById('submit-button')
 submitBtn.addEventListener('click', async function (event) {
     event.preventDefault();
@@ -8,12 +7,13 @@ submitBtn.addEventListener('click', async function (event) {
     let ratingObj = {
         name: name,
         rating: rating
-    };
+    }
+    postData(ratingObj);
+
+    updateRatingCount(rating, 1);
+
     if (submitBtn.textContent === "UPDATE") {
-        
-        submitBtn.textContent = "SUBMIT";
-    } else {
-        postData(ratingObj);
+        submitBtn.textContent = "SUBMIT";    
     }
 
     const form = document.getElementById('feedbackForm');
@@ -24,19 +24,18 @@ function postData(ratingObj) {
     axios.post("https://crudcrud.com/api/10fb9d05be3d43edb7998803ee90d1bf/userData", ratingObj)
         .then((result) => {
             console.log(result);
-            userId = newRatingObj.id;
             let newRatingObj = {
                 id: result.data._id,
                 name: result.data.name,
                 rating: result.data.rating
             };
+            userId = newRatingObj.id;
             localStorage.setItem(userId, JSON.stringify(newRatingObj));
             displayUserRating(newRatingObj);
         }).catch((err) => {
             console.log(err);
         });
 }
-
 
 function displayUserRating(newRatingObj) {
     const parentElm = document.getElementById('displayFeedbackList');
@@ -64,11 +63,11 @@ function displayUserRating(newRatingObj) {
     parentElm.appendChild(childElm);
 }
 
-
-
 function deleteUser(event) {
     const targetItem = event.target.parentNode.parentNode;
     userId = targetItem.id;
+    const storedUser = JSON.parse(localStorage.getItem(userId));
+    updateRatingCount(storedUser.rating, -1);
     localStorage.removeItem(userId);
     removeFromScreen(targetItem);
     deleteData(userId);
@@ -84,8 +83,6 @@ function deleteData(userId) {
         });
 }
 
-
-
 function editUser(event) {
     const targetItem = event.target.parentNode.parentNode;
     const userId = targetItem.id;
@@ -96,54 +93,23 @@ function editUser(event) {
 
     const submit = document.getElementById('submit-button');
     submit.textContent = "UPDATE";
-
+    updateRatingCount(storedUser.rating, -1);
+    deleteData(userId);
     removeFromScreen(targetItem);
 }
-
-function updateData(userId) {
-    const name = document.getElementById('name').value;
-    const rating = document.getElementById('rating').value;
-
-    let ratingObj = {
-        name: name,
-        rating: rating
-    };
-
-    axios.put(`https://crudcrud.com/api/8e6ea4e3712b46639e45aec62c6d5d76/userData/${userId}`, ratingObj)
-       .then((response) => {
-            console.log(response);
-            let newRatingObj = {
-                id: response.data._id,
-                name: response.data.name,
-                rating: response.data.rating
-            };
-            localStorage.setItem(userId, JSON.stringify(newRatingObj));
-            displayUserRating(newRatingObj);
-        })
-       .catch((err) => {
-            console.log(err);
-        });
-}
-
-
 
 function removeFromScreen(targetItem) {
     const parentElement = targetItem.parentNode;
     parentElement.removeChild(targetItem);
 }
 
-
-
-
-
-
-
-
-
-
+function updateRatingCount(rating, increment) {
+    const ratingSpan = document.getElementById(`rating${rating}`);
+    ratingSpan.textContent = parseInt(ratingSpan.textContent) + increment;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    axios.get("https://crudcrud.com/api/8e6ea4e3712b46639e45aec62c6d5d76/userData")
+    axios.get("https://crudcrud.com/api/10fb9d05be3d43edb7998803ee90d1bf/userData")
         .then((response) => {
             const users = response.data;
             const parentElm = document.getElementById('displayFeedbackList');
@@ -155,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 displayUserRating(newRatingObj);
                 localStorage.setItem(newRatingObj.id, JSON.stringify(newRatingObj));
+                updateRatingCount(newRatingObj.rating, 1);
             });
         })
         .catch((err) => {
