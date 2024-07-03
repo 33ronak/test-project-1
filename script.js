@@ -13,7 +13,7 @@ addBtn.addEventListener('click', async function (event) {
 
     const isSeatOccupied = await checkSeatOccupied(seat);
     if (isSeatOccupied) {
-        alert("This Seat is occupied");
+        alert("This Seat is Occupied !");
     } else{
         postData(movieObj);
     }   
@@ -166,25 +166,41 @@ findSlotInput.addEventListener('keyup', function (event) {
 
 function filterUserBySeat(seatNumber) {
     const displayUsers = document.querySelectorAll('#display-user h4');
+    let noUserFound = document.getElementById('no-user-found');
 
     if (seatNumber === '') {
         displayUsers.forEach(user => {
             user.style.display = 'flex';
         });
+        if (noUserFound) {
+            noUserFound.remove();
+        }
     } else {
         let found = false;
 
         displayUsers.forEach(user => {
             const userText = user.textContent;
-            const words = userText.split(' ');
-            const userSeat = words[words.indexOf('Seat:') + 1];
-
-            if (userSeat === seatNumber) {
+            if (userText.includes(`Seat: ${seatNumber}`)) {
                 user.style.display = 'flex';
                 found = true;
             } else {
                 user.style.display = 'none';
             }
         });
+
+        if (!found) {
+            if (!noUserFound) {
+                noUserFound = document.createElement('h2');
+                noUserFound.id = 'no-user-found';
+                noUserFound.textContent = 'No User Found';
+                document.getElementById('display-user').appendChild(noUserFound);
+            } else {
+                noUserFound.style.display = 'block';
+            }
+        } else {
+            if (noUserFound) {
+                noUserFound.style.display = 'none';
+            }
+        }
     }
 }
