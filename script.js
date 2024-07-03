@@ -1,45 +1,75 @@
-const submitBtn = document.getElementById('submit-button')
-submitBtn.addEventListener('click', async function (event) {
+let totalBookings = 0;
+
+const addBtn = document.getElementById('submit-button')
+addBtn.addEventListener('click', async function (event) {
     event.preventDefault();
     const name = document.getElementById('name').value;
-    const rating = document.getElementById('rating').value;
+    const seat = document.getElementById('seat-number').value;
 
-    let ratingObj = {
+    let movieObj = {
         name: name,
-        rating: rating
+        seat: seat
     }
-    postData(ratingObj);
 
-    updateRatingCount(rating, 1);
+    const isSeatOccupied = await checkSeatOccupied(seat);
+    if (isSeatOccupied) {
+        alert("This Seat is occupied");
+    } else{
+        postData(movieObj);
+    }   
 
-    if (submitBtn.textContent === "UPDATE") {
-        submitBtn.textContent = "SUBMIT";    
+    if (addBtn.textContent === "UPDATE") {
+        addBtn.textContent = "ADD";    
     }
 
     const form = document.getElementById('feedbackForm');
     form.reset();
 });
 
-function postData(ratingObj) {
-    axios.post("https://crudcrud.com/api/10fb9d05be3d43edb7998803ee90d1bf/userData", ratingObj)
+async function checkSeatOccupied(seat) {
+    return axios.get("https://crudcrud.com/api/854f671e2a0f426cb334ddc43ce0945b/userData")
+        .then(response => {
+            const users = response.data;
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].seat === seat) {
+                    return true;
+                }
+            }
+            return false;
+        })
+        .catch(err => {
+            console.log(err);
+            return false;
+        });
+}
+
+function postData(movieObj) {
+    axios.post("https://crudcrud.com/api/854f671e2a0f426cb334ddc43ce0945b/userData", movieObj)
         .then((result) => {
             console.log(result);
-            let newRatingObj = {
+            let newMovieObj = {
                 id: result.data._id,
                 name: result.data.name,
-                rating: result.data.rating
+                seat: result.data.seat
             };
-            userId = newRatingObj.id;
-            localStorage.setItem(userId, JSON.stringify(newRatingObj));
-            displayUserRating(newRatingObj);
+            let userId = newMovieObj.id;
+            localStorage.setItem(userId, JSON.stringify(newMovieObj));
+            displayUserSeat(newMovieObj);
+            totalBookings++;
+            document.getElementById('total-booking').textContent = totalBookings;
         }).catch((err) => {
             console.log(err);
         });
 }
 
-function displayUserRating(newRatingObj) {
-    const parentElm = document.getElementById('displayFeedbackList');
-    const childElm = document.createElement('li');
+function displayUserSeat(newMovieObj) {
+    const parentElm = document.getElementById('display-user');
+    
+    if (parentElm.querySelector('h1')) {
+        parentElm.innerHTML = '';
+    }
+
+    const childElm = document.createElement('h4');
     const btnContainer = document.createElement('span');
 
     const editBtn = document.createElement('button');
@@ -57,24 +87,28 @@ function displayUserRating(newRatingObj) {
     btnContainer.appendChild(editBtn);
     btnContainer.appendChild(deleteBtn);
 
-    childElm.textContent = `Name:- ${newRatingObj.name}, Rating:- ${newRatingObj.rating} `;
-    childElm.setAttribute('id', newRatingObj.id)
+    childElm.textContent = `Name: ${newMovieObj.name}, Seat: ${newMovieObj.seat} `;
+    childElm.setAttribute('id', newMovieObj.id)
     childElm.appendChild(btnContainer);
     parentElm.appendChild(childElm);
+
+    document.getElementById('total-booking').textContent = totalBookings;
 }
 
 function deleteUser(event) {
     const targetItem = event.target.parentNode.parentNode;
-    userId = targetItem.id;
+    const userId = targetItem.id;
     const storedUser = JSON.parse(localStorage.getItem(userId));
-    updateRatingCount(storedUser.rating, -1);
+
     localStorage.removeItem(userId);
     removeFromScreen(targetItem);
     deleteData(userId);
+    totalBookings--; 
+    document.getElementById('total-booking').textContent = totalBookings;
 }
 
 function deleteData(userId) {
-    axios.delete(`https://crudcrud.com/api/10fb9d05be3d43edb7998803ee90d1bf/userData/${userId}`)
+    axios.delete(`https://crudcrud.com/api/854f671e2a0f426cb334ddc43ce0945b/userData/${userId}`)
         .then((response) => {
             console.log(response);
         })
@@ -89,42 +123,68 @@ function editUser(event) {
     const storedUser = JSON.parse(localStorage.getItem(userId));
 
     document.getElementById('name').value = storedUser.name;
-    document.getElementById('rating').value = storedUser.rating;
+    document.getElementById('seat-number').value = storedUser.seat;
 
     const submit = document.getElementById('submit-button');
     submit.textContent = "UPDATE";
-    updateRatingCount(storedUser.rating, -1);
+
+    totalBookings--;
     deleteData(userId);
     removeFromScreen(targetItem);
 }
 
-function removeFromScreen(targetItem) {
-    const parentElement = targetItem.parentNode;
-    parentElement.removeChild(targetItem);
+function removeFromScreen(element) {
+    element.remove();
 }
 
-function updateRatingCount(rating, increment) {
-    const ratingSpan = document.getElementById(`rating${rating}`);
-    ratingSpan.textContent = parseInt(ratingSpan.textContent) + increment;
-}
 
 document.addEventListener('DOMContentLoaded', () => {
-    axios.get("https://crudcrud.com/api/10fb9d05be3d43edb7998803ee90d1bf/userData")
-        .then((response) => {
+    axios.get("https://crudcrud.com/api/854f671e2a0f426cb334ddc43ce0945b/userData")
+        .then(response => {
             const users = response.data;
-            const parentElm = document.getElementById('displayFeedbackList');
-            users.forEach((user) => {
-                const newRatingObj = {
+            users.forEach(user => {
+                localStorage.setItem(user._id, JSON.stringify(user));
+                displayUserSeat({
                     id: user._id,
                     name: user.name,
-                    rating: user.rating
-                };
-                displayUserRating(newRatingObj);
-                localStorage.setItem(newRatingObj.id, JSON.stringify(newRatingObj));
-                updateRatingCount(newRatingObj.rating, 1);
+                    seat: user.seat
+                });
+                totalBookings++;
+                document.getElementById('total-booking').textContent = totalBookings;
             });
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         });
 });
+
+const findSlotInput = document.getElementById('find-slot');
+findSlotInput.addEventListener('keyup', function (event) {
+    const seatNumber = event.target.value.trim();
+    filterUserBySeat(seatNumber);
+});
+
+function filterUserBySeat(seatNumber) {
+    const displayUsers = document.querySelectorAll('#display-user h4');
+
+    if (seatNumber === '') {
+        displayUsers.forEach(user => {
+            user.style.display = 'flex';
+        });
+    } else {
+        let found = false;
+
+        displayUsers.forEach(user => {
+            const userText = user.textContent;
+            const words = userText.split(' ');
+            const userSeat = words[words.indexOf('Seat:') + 1];
+
+            if (userSeat === seatNumber) {
+                user.style.display = 'flex';
+                found = true;
+            } else {
+                user.style.display = 'none';
+            }
+        });
+    }
+}

@@ -3,43 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback</title>
+    <title>Movie Booking</title>
 </head>
 <body>
-    
+
     <div style="text-align: center;">
-        <h1>Feedback System</h1>     
+        <h1>Movie Booking</h1>     
     </div>
 
-    <h3>Overall Ratings</h3>
-
-    <div>
-        <span>*</span> <span id="rating1">0</span><br>
-        <span>**</span> <span id="rating2">0</span><br>
-        <span>***</span> <span id="rating3">0</span><br>
-        <span>****</span> <span id="rating4">0</span><br>
-        <span>*****</span> <span id="rating5">0</span> <br>
-    </div>
-    <br>
+    <div style="text-align: center;">
+        <span>Total Booking:  </span><span id="total-booking">0</span><br>
+    </div><br>
+    <div style="text-align: center;">
+        <span>Find Slot: </span><input id="find-slot" type="number">
+    </div><br>
 
     <div id="form">
         <form id="feedbackForm">
-            <label for="name">Enter Your name :</label>
+            <label for="name">User Name : </label>
             <input type="text" id="name" placeholder="Enter Name...">
-            <label>Give a rating</label>
-            <select id="rating">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
-            <button id="submit-button">SUBMIT</button>
+            <label>Seat Number : </label> <input type="number" id="seat-number">
+            <button id="submit-button">ADD</button>
         </form>
         <br><br>
-        <h3 id="feedbackHeader">ALL FEEDBACKS</h3>
-        <div>
-            <ul id="displayFeedbackList"></ul>
+        <div id="display-user">
+            <h1>Nothing Present</h1>
         </div>
     </div>
     
