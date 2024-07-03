@@ -1,1 +1,3 @@
-# test-project-1
+# Movie-Booking Sharpener
+
+3hr Javascript project with REST API implementation.

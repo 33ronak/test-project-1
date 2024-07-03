@@ -1,5 +1,6 @@
 let totalBookings = 0;
 
+
 const addBtn = document.getElementById('submit-button')
 addBtn.addEventListener('click', async function (event) {
     event.preventDefault();
@@ -25,6 +26,8 @@ addBtn.addEventListener('click', async function (event) {
     const form = document.getElementById('feedbackForm');
     form.reset();
 });
+
+
 
 async function checkSeatOccupied(seat) {
     return axios.get("https://crudcrud.com/api/854f671e2a0f426cb334ddc43ce0945b/userData")
@@ -62,6 +65,8 @@ function postData(movieObj) {
         });
 }
 
+
+
 function displayUserSeat(newMovieObj) {
     const parentElm = document.getElementById('display-user');
     
@@ -95,6 +100,8 @@ function displayUserSeat(newMovieObj) {
     document.getElementById('total-booking').textContent = totalBookings;
 }
 
+
+
 function deleteUser(event) {
     const targetItem = event.target.parentNode.parentNode;
     const userId = targetItem.id;
@@ -117,6 +124,8 @@ function deleteData(userId) {
         });
 }
 
+
+
 function editUser(event) {
     const targetItem = event.target.parentNode.parentNode;
     const userId = targetItem.id;
@@ -138,6 +147,7 @@ function removeFromScreen(element) {
 }
 
 
+
 document.addEventListener('DOMContentLoaded', () => {
     axios.get("https://crudcrud.com/api/854f671e2a0f426cb334ddc43ce0945b/userData")
         .then(response => {
@@ -157,6 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(err);
         });
 });
+
+
 
 const findSlotInput = document.getElementById('find-slot');
 findSlotInput.addEventListener('keyup', function (event) {
