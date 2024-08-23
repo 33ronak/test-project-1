@@ -3,37 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Booking</title>
+    <title>Voting System</title>
 </head>
 <body>
-
     <div style="text-align: center;">
-        <h1>Movie Booking</h1>     
+        <h1>Class Monitor Vote</h1>
+        <span>Total Votes</span><span id="totalVotes">0</span>
     </div>
-
-    <div style="text-align: center;">
-        <span>Total Booking:  </span><span id="total-booking">0</span><br>
-    </div><br>
     
-    <div style="text-align: center;">
-        <span>Find Slot: </span><input id="find-slot" type="number">
-    </div><br>
-
     <div id="form">
-        <form id="feedbackForm">
-            <label for="name">User Name : </label>
+        <form id="votingForm">
+            <label for="name">Student Name : </label>
             <input type="text" id="name" placeholder="Enter Name...">
-            <label>Seat Number : </label> <input type="number" id="seat-number">
-            <button id="submit-button">ADD</button>
+            <label>Class Monitor </label> 
+            <select name="monitors" id="candidate">
+                <option value="Suresh">Suresh</option>
+                <option value="Deepank">Deepank</option>
+                <option value="Abhik">Abhik</option>
+            </select>
+            <button id="submit-button">VOTE</button>
         </form>
         <br><br>
         <div id="display-user">
-            <h1>Nothing Present</h1>
+    
+            <h1>Suresh</h1>
+            <span>Total</span>
+            <span id="voteSuresh">0</span>
+            <div id="displaySureshList"></div> 
+            <br><br>
+    
+            <h1>Deepank</h1>
+            <span>Total</span>
+            <span id="voteDeepank">0</span>
+            <div id="displayDeepankList"></div> 
+            <br><br>
+    
+            <h1>Abhik</h1>
+            <span>Total</span>
+            <span id="voteAbhik">0</span>
+            <div id="displayAbhikList"></div> 
+            <br><br>
+    
         </div>
     </div>
     
+    
 </body>
-
-<script src="script.js"></script> 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
+    <script src="script.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
 </html>
