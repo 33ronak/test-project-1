@@ -1,42 +1,34 @@
-const baseUrl = "https://crudcrud.com/api/e02c1251426a49129facab1a1297656c";
+const baseUrl = "https://crudcrud.com/api/b917f28ef69140baac224442c76358bf";
 
 const voteBtn = document.getElementById('submit-button');
-voteBtn.addEventListener('click', function (event) {
+voteBtn.addEventListener('click', (event) => {
     event.preventDefault();
     const userName = document.getElementById('name').value;
     const userVote = document.getElementById('candidate').value;
 
-    let voteObj = {
-        name: userName,
-        vote: userVote
+    const voteObj = { 
+        name: userName, 
+        vote: userVote 
     };
 
-    postData(voteObj);
+    postData(voteObj);  
 
     const form = document.getElementById('votingForm');
     form.reset();
 });
 
+async function postData (obj) {
+    try {
+        const result = await axios.post(`${baseUrl}/votingData`, obj);
+        let uniqueId = result.data._id;
+        displayUserVote(obj, uniqueId);
+        updateVoteCounts(obj.vote);
+    } catch (err) {
+        console.log('Error:', err);
+    }
+};
 
-function postData(obj) {
-    axios.post(`${baseUrl}/votingData`, obj)
-        .then((result) => {
-            console.log(result);
-            let newObj = {
-                id: result.data._id,
-                name: obj.name,
-                vote: obj.vote
-            };
-            let userId = newObj.id;
-            localStorage.setItem(userId, JSON.stringify(newObj));
-            displayUserVote(newObj);
-            updateVoteCounts(newObj.vote);
-        }).catch((err) => {
-            console.log(err);
-        });
-}
-
-function displayUserVote(obj) {
+function displayUserVote(obj, id){
     const listName = `display${obj.vote}List`;
     const listUserName = obj.name;
 
@@ -48,12 +40,12 @@ function displayUserVote(obj) {
     const childElm = document.createElement('div');
     const btnContainer = document.createElement('span');
 
-    childElm.id = obj.id;
+    childElm.id = id;
 
     const deleteVoteBtn = document.createElement('button');
     deleteVoteBtn.textContent = "DELETE";
-    deleteVoteBtn.addEventListener('click', function (event) {
-        deleteUserVote(event);
+    deleteVoteBtn.addEventListener('click', (event) => {
+        deleteUserVote(event, obj.vote);
     });
 
     btnContainer.appendChild(displayUserVoteName);
@@ -61,25 +53,21 @@ function displayUserVote(obj) {
 
     childElm.appendChild(btnContainer);
     parentElm.appendChild(childElm);
-}
+};
 
-function deleteUserVote(event) {
+async function deleteUserVote (event, vote){
     const targetItem = event.target.parentNode.parentNode;
     const userId = targetItem.id;
-    const votingData = JSON.parse(localStorage.getItem(userId));
 
-    localStorage.removeItem(userId);
-
-    axios.delete(`${baseUrl}/votingData/${userId}`)
-        .then((result) => console.log(result))
-        .catch((err) => console.log(err));
-
-    updateVoteCounts(votingData.vote, false);
-
-    const listItem = targetItem;
-    const parentElm = listItem.parentElement;
-    parentElm.removeChild(listItem);
-}
+    try {
+        await axios.delete(`${baseUrl}/votingData/${userId}`);
+        updateVoteCounts(vote, false);
+        const parentElm = targetItem.parentElement;
+        parentElm.removeChild(targetItem);
+    } catch (err) {
+        console.log(err);
+    }
+};
 
 function updateVoteCounts(candidate, increment = true) {
     const totalVotes = document.getElementById('totalVotes');
@@ -89,17 +77,15 @@ function updateVoteCounts(candidate, increment = true) {
     candidateVotes.textContent = parseInt(candidateVotes.textContent) + (increment ? 1 : -1);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    axios.get(`${baseUrl}/votingData`)
-        .then(response => {
-            const items = response.data;
-            items.forEach(item => {
-                localStorage.setItem(item._id, JSON.stringify(item));
-                displayUserVote(item);
-                updateVoteCounts(item.vote); 
-            });
-        })
-        .catch(err => {
-            console.log(err);
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await axios.get(`${baseUrl}/votingData`);
+        const items = response.data;
+        items.forEach(item => {
+            displayUserVote(item, item._id);
+            updateVoteCounts(item.vote);
         });
+    } catch (err) {
+        console.log(err);
+    }
 });
